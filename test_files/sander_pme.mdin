@@ -1,0 +1,18 @@
+sander input file with equivalent settings as OpenMM
+ &cntrl
+    nstlim=1, dt=1.0e-6,    ! 1 step of MD with a tiny time step
+    ntwf=-1, ntwv=-1, ntwx=1 ! archive positions, velocities, and forces
+    ntc=2, ntf=1,            ! SHAKE, but compute full interactions
+    ioutfm=1, ntxo=2,        ! NetCDF for everything
+    cut=8.0,                 ! 8 angstrom cutoff
+    ntpr=1,                  ! print energies every step
+    temp0=300.0, ntt=0,      ! No temperature control
+ /
+ &ewald
+    ew_coeff=0.3285326106,   ! Same as the value OpenMM uses for 5e-4 dsum_tol
+                             ! with an 8 Angstrom cutoff (value in 1/Ang)
+    nfft1=60, nfft2=64,      !      Default grid size used by OpenMM for
+    nfft3=60,                !      the HEWL system
+    vdwmeth=1,               ! 0 - no long-range dispersion correction
+                             ! 1 - use long-range dispersion correction
+ /
