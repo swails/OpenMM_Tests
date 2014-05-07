@@ -128,7 +128,7 @@ class TestPME(object):
             context2 = mm.Context(system, dummyint2, plat, properties)
             context3 = mm.Context(self.systemapp, dummyint3, plat,
                                   properties)
-            context4 = mm.Context(xmlsys, dummyint1, plat, properties)
+            context4 = mm.Context(xmlsys, dummyint4, plat, properties)
         # Set the context positions
         context1.setPositions(self.parm.positions)
         context2.setPositions(self.parm.positions)
