@@ -42,6 +42,14 @@ def get_fn(fname, status='OLD'):
         raise IOError('Could not find %s' % fname)
     return fname
 
+def red(text):
+    """ Return text red """
+    return '\033[91m%s\033[0m' % text
+
+def green(text):
+    """ Return text green """
+    return '\033[92m%s\033[0m' % text
+
 def colorize_error(error, tolerance=0.001):
     """
     Print out the error in either green or red (agrees within tolerance or
@@ -60,5 +68,33 @@ def colorize_error(error, tolerance=0.001):
     inclusive (i.e., if error == tolerance, it is printed as green)
     """
     if abs(error) <= tolerance:
-        return '\033[92m%12.4e\033[0m' % error
-    return '\033[91m%12.4e\033[0m' % error
+        return green('%12.4e' % error)
+    return red('%12.4e' % error)
+
+def colorize_list(numbers, tolerance=0.001):
+    """
+    Same as colorize_error, but for a list of numbers
+
+    Parameters
+    ----------
+    error : float
+        The error to print
+    tolerance : float
+        The cutoff by which we declare an error is "ok" (green) or "not" (red)
+
+    Returns
+    -------
+    tuple of colorized strings for each number
+
+    Notes
+    -----
+    The absolute value of the error is compared to the tolerance. Tolerance is
+    inclusive (i.e., if error == tolerance, it is printed as green)
+    """
+    retval = []
+    for number in numbers:
+        if abs(number) <= tolerance:
+            retval.append(green('%12.4e' % number))
+        else:
+            retval.append(red('%12.4e' % number))
+    return tuple(retval)

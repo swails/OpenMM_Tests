@@ -4,7 +4,7 @@ computes.
 """
 from copy import copy
 
-from utils import get_fn, colorize_error
+from utils import get_fn, colorize_error, red, green, colorize_list
 
 # Now import the ParmEd and OpenMM utilities
 from simtk import unit as u
@@ -85,10 +85,15 @@ class TestPME(object):
                                        nonbondedMethod=app.PME)
         system.setDefaultPeriodicBoxVectors(*self.parm.box_vectors)
 
+        # Test serialization
+        xmlsys = mm.XmlSerializer.deserialize(
+                        mm.XmlSerializer.serialize(self.system)
+        )
+
         # Loop through all systems and turn on or off the dispersion correction
         print 'Trying to set PME parameters...',
         succeeded = None
-        for sysmod in (self.system, self.systemapp, system):
+        for sysmod in (self.system, self.systemapp, system, xmlsys):
             for force in sysmod.getForces():
                 if isinstance(force, mm.NonbondedForce):
                     force.setUseDispersionCorrection(use_dispersion_correction)
@@ -111,20 +116,24 @@ class TestPME(object):
         dummyint1 = mm.VerletIntegrator(1.0e-6*u.picoseconds)
         dummyint2 = mm.VerletIntegrator(1.0e-6*u.picoseconds)
         dummyint3 = mm.VerletIntegrator(1.0e-6*u.picoseconds)
+        dummyint4 = mm.VerletIntegrator(1.0e-6*u.picoseconds)
         # Define the contexts
         if properties is None:
             context1 = mm.Context(self.system, dummyint1, plat)
             context2 = mm.Context(system, dummyint2, plat)
             context3 = mm.Context(self.systemapp, dummyint3, plat)
+            context4 = mm.Context(xmlsys, dummyint4, plat)
         else:
             context1 = mm.Context(self.system, dummyint1, plat, properties)
             context2 = mm.Context(system, dummyint2, plat, properties)
             context3 = mm.Context(self.systemapp, dummyint3, plat,
                                   properties)
+            context4 = mm.Context(xmlsys, dummyint1, plat, properties)
         # Set the context positions
         context1.setPositions(self.parm.positions)
         context2.setPositions(self.parm.positions)
         context3.setPositions(self.crdapp.getPositions())
+        context4.setPositions(self.parm.positions)
         # Get the energies
         eunit = u.kilocalories_per_mole
         state = context1.getState(getEnergy=True, getForces=True,
@@ -134,22 +143,43 @@ class TestPME(object):
         tote = state.getPotentialEnergy().value_in_unit(eunit)
         state = context3.getState(getEnergy=True, enforcePeriodicBox=True)
         toteapp = state.getPotentialEnergy().value_in_unit(eunit)
-        # Now get the decomposed energies
+        state = context4.getState(getEnergy=True, enforcePeriodicBox=True)
+        xmltote = state.getPotentialEnergy().value_in_unit(eunit)
+        # Now get the decomposed energies from both the system and the
+        # deserialized system to check that serialization and deserialization
+        # behave as expected with these force objects and force groups
         state = context1.getState(getEnergy=True, enforcePeriodicBox=True,
                                   groups=2**self.parm.BOND_FORCE_GROUP)
         bonde = state.getPotentialEnergy().value_in_unit(eunit)
+        state = context4.getState(getEnergy=True, enforcePeriodicBox=True,
+                                  groups=2**self.parm.BOND_FORCE_GROUP)
+        xmlbonde = state.getPotentialEnergy().value_in_unit(eunit)
+
         state = context1.getState(getEnergy=True, enforcePeriodicBox=True,
                                   groups=2**self.parm.ANGLE_FORCE_GROUP)
         anglee = state.getPotentialEnergy().value_in_unit(eunit)
+        state = context4.getState(getEnergy=True, enforcePeriodicBox=True,
+                                  groups=2**self.parm.ANGLE_FORCE_GROUP)
+        xmlanglee = state.getPotentialEnergy().value_in_unit(eunit)
+
         state = context1.getState(getEnergy=True, enforcePeriodicBox=True,
                                   groups=2**self.parm.DIHEDRAL_FORCE_GROUP)
         dihede = state.getPotentialEnergy().value_in_unit(eunit)
+        state = context4.getState(getEnergy=True, enforcePeriodicBox=True,
+                                  groups=2**self.parm.DIHEDRAL_FORCE_GROUP)
+        xmldihede = state.getPotentialEnergy().value_in_unit(eunit)
+
         state = context1.getState(getEnergy=True, enforcePeriodicBox=True,
                                   groups=2**self.parm.NONBONDED_FORCE_GROUP)
         nonbe = state.getPotentialEnergy().value_in_unit(eunit)
+        state = context4.getState(getEnergy=True, enforcePeriodicBox=True,
+                                  groups=2**self.parm.NONBONDED_FORCE_GROUP)
+        xmlnonbe = state.getPotentialEnergy().value_in_unit(eunit)
+
         state = context2.getState(getEnergy=True, enforcePeriodicBox=True,
                                   groups=2**self.parm.NONBONDED_FORCE_GROUP)
         vdwe = state.getPotentialEnergy().value_in_unit(eunit)
+
         eele = nonbe - vdwe
         # Now get the sander forces and compare them
         traj = netcdf_file(get_fn('sander_pme.nc'), 'r')
@@ -227,10 +257,40 @@ class TestPME(object):
         print ''
         print 'Difference b/w sander and OpenMM forces'
         print '---------------------------------------'
-        print 'Maximum deviation = [%12.4e, %12.4e, %12.4e]' % tuple(maxdif)
-        print 'Maximum rel. dev. = [%12.4e, %12.4e, %12.4e]' % tuple(maxrel)
-        print 'Average deviation = [%12.4e, %12.4e, %12.4e]' % tuple(avgdif)
-        print 'Average rel. dev. = [%12.4e, %12.4e, %12.4e]' % tuple(avgrel)
+        print 'Maximum deviation = [%12s, %12s, %12s]' % colorize_list(maxdif)
+        print 'Maximum rel. dev. = [%12s, %12s, %12s]' % colorize_list(maxrel)
+        print 'Average deviation = [%12s, %12s, %12s]' % colorize_list(avgdif)
+        print 'Average rel. dev. = [%12s, %12s, %12s]' % colorize_list(avgrel)
+
+        # Now test serialization
+        CUTOFF = 1e-6
+        print ''
+        print 'Serialization tests'
+        print '-------------------'
+        print 'Bond........',
+        if abs(xmlbonde - bonde) < CUTOFF:
+            print green('OK')
+        else:
+            dif = xmlbonde - bonde
+            print red('off by %.4e (%f%%)' % (dif, 100*dif/(max(bonde,xmlbonde))))
+        print 'Angle.......',
+        if abs(xmlanglee - anglee) < CUTOFF:
+            print green('OK')
+        else:
+            dif = xmlanglee - anglee
+            print red('off by %.4e (%f%%)' % (dif,100*dif/(max(anglee,xmlanglee))))
+        print 'Dihedral....',
+        if abs(xmldihede - dihede) < CUTOFF:
+            print green('OK')
+        else:
+            dif = xmldihede - dihede
+            print red('off by %.4e (%f%%)' % (dif,100*dif/(max(dihede,xmldihede))))
+        print 'Nonbonded...',
+        if abs(xmlnonbe - nonbe) < CUTOFF:
+            print green('OK')
+        else:
+            dif = xmlnonbe - nonbe
+            print red('off by %.4e (%f%%)' % (dif,100*dif/(max(nonbe,xmlnonbe))))
 
 # Log of available tests
 tests = (TestPME,)
