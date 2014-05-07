@@ -18,9 +18,13 @@ group = parser.add_argument_group('Available test cases',
                 'All available test cases that can be run with OpenMM.')
 group.add_argument('--all-tests', dest='all_tests', default=False,
                    action='store_true', help='Run all available tests')
-group.add_argument('--amber-hewl', dest='amber_hewl', default=False,
+group.add_argument('--amber-hewl-pme', dest='amber_hewl_pme', default=False,
                    action='store_true', help='''Run the HEWL tests from the
-                   Amber starting files.''')
+                   Amber starting files in explicit solvent.''')
+group.add_argument('--skip-slow' dest='skip_slow', default=False,
+                   action='store_true', help='''Skip platforms for tests that
+                   are known to be very slow (CustomGBForce on Reference or CPU
+                   platforms on big systems, for instance)''')
 group = parser.add_argument_group('Platforms', '''Options controlling which
                                   platforms get tested.''')
 group.add_argument('--list-platforms', dest='list_platforms', default=False,
@@ -84,7 +88,7 @@ def runtest(test, parallel=None, **kwargs):
             test.run(plat, **kwargs)
 
 # Now go through all of the tests
-if opt.all_tests or opt.amber_hewl:
+if opt.all_tests or opt.amber_hewl_pme:
     print '\nTesting the HEWL PME test case (with long-range correction)'
     print '-----------------------------------------------------------'
     test = testcases.testhewl.TestPME()
