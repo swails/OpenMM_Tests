@@ -21,7 +21,7 @@ group.add_argument('--all-tests', dest='all_tests', default=False,
 group.add_argument('--amber-hewl-pme', dest='amber_hewl_pme', default=False,
                    action='store_true', help='''Run the HEWL tests from the
                    Amber starting files in explicit solvent.''')
-group.add_argument('--skip-slow' dest='skip_slow', default=False,
+group.add_argument('--skip-slow', dest='skip_slow', default=False,
                    action='store_true', help='''Skip platforms for tests that
                    are known to be very slow (CustomGBForce on Reference or CPU
                    platforms on big systems, for instance)''')
