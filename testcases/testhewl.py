@@ -275,25 +275,25 @@ class TestPME(object):
             print green('OK')
         else:
             dif = xmlbonde - bonde
-            print red('off by %.4e (%f%%)' % (dif, 100*dif/(max(bonde,xmlbonde))))
+            print red('off by %.4e (%f%%)' % (dif, 100*dif/(bonde or xmlbonde)))
         print 'Angle.......',
         if abs(xmlanglee - anglee) < CUTOFF:
             print green('OK')
         else:
             dif = xmlanglee - anglee
-            print red('off by %.4e (%f%%)' % (dif,100*dif/(max(anglee,xmlanglee))))
+            print red('off by %.4e (%f%%)' % (dif,100*dif/(anglee or xmlanglee)))
         print 'Dihedral....',
         if abs(xmldihede - dihede) < CUTOFF:
             print green('OK')
         else:
             dif = xmldihede - dihede
-            print red('off by %.4e (%f%%)' % (dif,100*dif/(max(dihede,xmldihede))))
+            print red('off by %.4e (%f%%)' % (dif,100*dif/(dihede or xmldihede)))
         print 'Nonbonded...',
         if abs(xmlnonbe - nonbe) < CUTOFFNB:
             print green('OK')
         else:
             dif = xmlnonbe - nonbe
-            print red('off by %.4e (%f%%)' % (dif,100*dif/(max(nonbe,xmlnonbe))))
+            print red('off by %.4e (%f%%)' % (dif,100*dif/(nonbe or xmlnonbe)))
 
 # Log of available tests
 tests = (TestPME,)
