@@ -8,6 +8,8 @@ TEST_FILE_DIRECTORY = None
 TOTAL_FAILED = 0
 TOTAL_PASSED = 0
 
+TOTAL_TEST_SUMMARY = dict()
+
 def register_test_directory(folder):
     """ Registers the directory where the test files are kept """
     global TEST_FILE_DIRECTORY
@@ -106,13 +108,16 @@ def colorize_list(numbers, tolerance=0.001):
             retval.append(red('%12.4e' % number))
     return tuple(retval)
 
-def summarize():
+def summarize(testname):
     """
     Summarizes the number of times we failed a comparison (RED) and the number
     of times we passed a comparison (GREEN). Reset the tallies so we can use
     this again
     """
-    global TOTAL_FAILED, TOTAL_PASSED
-    print red('%d total failures' % TOTAL_FAILED, count=False)
-    print green('%d total successes' % TOTAL_PASSED, count=False)
+    global TOTAL_FAILED, TOTAL_PASSED, TOTAL_TEST_SUMMARY
+    failmsg = red('%d total failures' % TOTAL_FAILED, count=False)
+    passmsg = green('%d total successes' % TOTAL_PASSED, count=False)
+    TOTAL_TEST_SUMMARY[testname] = '%s\n%s' % (failmsg, passmsg)
+    print failmsg
+    print passmsg
     TOTAL_FAILED = TOTAL_PASSED = 0

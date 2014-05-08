@@ -97,5 +97,5 @@ if opt.all_tests or opt.amber_hewl_pme:
     print '--------------------------------------------------------------'
     runtest(test, use_dispersion_correction=False)
     print '='*80
-    utils.summarize()
+    utils.summarize('HEWL PME (Amber)')
     print '='*80
