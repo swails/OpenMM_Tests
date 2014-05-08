@@ -255,7 +255,7 @@ class TestPME(object):
         print ''
         print 'Difference b/w ParmEd and OpenMM App layer'
         print '------------------------------------------'
-        print 'Total    =', colorize_error(appdif, tolerance=5e-5)
+        print 'Total    =', colorize_error(appdif, tolerance=5e-3)
         print ''
         print 'Difference b/w sander and OpenMM forces'
         print '---------------------------------------'
