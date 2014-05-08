@@ -244,7 +244,7 @@ class TestPME(object):
                    colorize_error(vdwdif/sander['vdw'], 1e-4), \
                    '%12.4f'%sander['vdw']
         else:
-            print 'vdWaals  =', colorize_error(vdwdif), \
+            print 'vdWaals  =', colorize_error(vdwdif, 1e-2), \
                    colorize_error(vdwdif/sander['vdw'], 1e-6), \
                    '%12.4f'%sander['vdw']
         print 'Elec     =', colorize_error(eeldif, 4e0), \
