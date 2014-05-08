@@ -262,10 +262,11 @@ class TestPME(object):
         print 'Maximum deviation = [%12s, %12s, %12s]' % colorize_list(maxdif,2e0)
         print 'Maximum rel. dev. = [%12s, %12s, %12s]' % colorize_list(maxrel,2e0)
         print 'Average deviation = [%12s, %12s, %12s]' % colorize_list(avgdif,1e-1)
-        print 'Average rel. dev. = [%12s, %12s, %12s]' % colorize_list(avgrel,1e-3)
+        print 'Average rel. dev. = [%12s, %12s, %12s]' % colorize_list(avgrel,5e-1)
 
         # Now test serialization
         CUTOFF = 1e-5
+        CUTOFFNB = 1e-2
         print ''
         print 'Serialization tests'
         print '-------------------'
@@ -288,7 +289,7 @@ class TestPME(object):
             dif = xmldihede - dihede
             print red('off by %.4e (%f%%)' % (dif,100*dif/(max(dihede,xmldihede))))
         print 'Nonbonded...',
-        if abs(xmlnonbe - nonbe) < CUTOFF:
+        if abs(xmlnonbe - nonbe) < CUTOFFNB:
             print green('OK')
         else:
             dif = xmlnonbe - nonbe
