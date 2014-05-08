@@ -13,6 +13,9 @@ import warnings
 fpath, fname = os.path.split(sys.argv[0])
 utils.register_test_directory(os.path.join(fpath, 'test_files'))
 
+# Unbuffer stdout
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
 parser = ArgumentParser()
 group = parser.add_argument_group('Available test cases',
                 'All available test cases that can be run with OpenMM.')
