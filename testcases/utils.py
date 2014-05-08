@@ -5,6 +5,9 @@ Various utilities for running the tests
 import os
 TEST_FILE_DIRECTORY = None
 
+TOTAL_FAILED = 0
+TOTAL_PASSED = 0
+
 def register_test_directory(folder):
     """ Registers the directory where the test files are kept """
     global TEST_FILE_DIRECTORY
@@ -42,12 +45,16 @@ def get_fn(fname, status='OLD'):
         raise IOError('Could not find %s' % fname)
     return fname
 
-def red(text):
+def red(text, count=True):
     """ Return text red """
+    global TOTAL_FAILED
+    TOTAL_FAILED += int(bool(count))
     return '\033[91m%s\033[0m' % text
 
-def green(text):
+def green(text, count=True):
     """ Return text green """
+    global TOTAL_PASSED
+    TOTAL_PASSED += int(bool(count))
     return '\033[92m%s\033[0m' % text
 
 def colorize_error(error, tolerance=0.001):
@@ -98,3 +105,14 @@ def colorize_list(numbers, tolerance=0.001):
         else:
             retval.append(red('%12.4e' % number))
     return tuple(retval)
+
+def summarize():
+    """
+    Summarizes the number of times we failed a comparison (RED) and the number
+    of times we passed a comparison (GREEN). Reset the tallies so we can use
+    this again
+    """
+    global TOTAL_FAILED, TOTAL_PASSED
+    print red('%d total failures' % TOTAL_FAILED, count=False)
+    print green('%d total successes' % TOTAL_PASSED, count=False)
+    TOTAL_FAILED = TOTAL_PASSED = 0

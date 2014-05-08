@@ -213,7 +213,9 @@ class TestPME(object):
                       total=-69285.4160)
         if not use_dispersion_correction:
             # Without the long-range dispersion correction, VDWAALS = 8943.8420
+            sander['total'] -= sander['vdw']
             sander['vdw'] = 8943.8420 + 440.7084
+            sander['total'] += sander['vdw']
         bonddif = bonde - sander['bond']
         angledif = anglee - sander['angle']
         diheddif = dihede - sander['dihedral']
@@ -245,10 +247,10 @@ class TestPME(object):
             print 'vdWaals  =', colorize_error(vdwdif), \
                    colorize_error(vdwdif/sander['vdw'], 1e-6), \
                    '%12.4f'%sander['vdw']
-        print 'Elec     =', colorize_error(eeldif), \
-               colorize_error(eeldif/sander['eel'], 1e-6), '%12.4f'%sander['eel']
-        print 'Total    =', colorize_error(totaldif), \
-               colorize_error(totaldif/sander['total'], 1e-6), \
+        print 'Elec     =', colorize_error(eeldif, 4e0), \
+               colorize_error(eeldif/sander['eel'], 1e-3), '%12.4f'%sander['eel']
+        print 'Total    =', colorize_error(totaldif, 4e0), \
+               colorize_error(totaldif/sander['total'], 1e-3), \
                '%12.4f'%sander['total']
         print ''
         print 'Difference b/w ParmEd and OpenMM App layer'
@@ -257,13 +259,13 @@ class TestPME(object):
         print ''
         print 'Difference b/w sander and OpenMM forces'
         print '---------------------------------------'
-        print 'Maximum deviation = [%12s, %12s, %12s]' % colorize_list(maxdif)
-        print 'Maximum rel. dev. = [%12s, %12s, %12s]' % colorize_list(maxrel)
-        print 'Average deviation = [%12s, %12s, %12s]' % colorize_list(avgdif)
-        print 'Average rel. dev. = [%12s, %12s, %12s]' % colorize_list(avgrel)
+        print 'Maximum deviation = [%12s, %12s, %12s]' % colorize_list(maxdif,2e0)
+        print 'Maximum rel. dev. = [%12s, %12s, %12s]' % colorize_list(maxrel,2e0)
+        print 'Average deviation = [%12s, %12s, %12s]' % colorize_list(avgdif,1e-1)
+        print 'Average rel. dev. = [%12s, %12s, %12s]' % colorize_list(avgrel,1e-3)
 
         # Now test serialization
-        CUTOFF = 1e-6
+        CUTOFF = 1e-5
         print ''
         print 'Serialization tests'
         print '-------------------'

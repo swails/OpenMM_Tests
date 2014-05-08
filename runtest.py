@@ -79,7 +79,7 @@ def runtest(test, parallel=None, **kwargs):
     global testplatforms
     for plat in testplatforms:
         print '\n\tTesting %s platform' % plat
-        print '\t----------------' + '-'*len(plat)
+        print '\t-----------------' + '-'*len(plat)
         if plat in ('CUDA', 'OpenCL'):
             for precision in ('double', 'mixed', 'single'):
                 print '\t%s precision' % precision
@@ -96,4 +96,6 @@ if opt.all_tests or opt.amber_hewl_pme:
     print '\nTesting the HEWL PME test case (without long-range correction)'
     print '--------------------------------------------------------------'
     runtest(test, use_dispersion_correction=False)
+    print '='*80
+    utils.summarize()
     print '='*80
