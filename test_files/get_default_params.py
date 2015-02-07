@@ -5,7 +5,7 @@ from simtk.unit import *
 from simtk.openmm import *
 from simtk.openmm.app import *
 
-from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
+from chemistry.amber import AmberParm
 
 parm = AmberParm('4LYT.solv10.parm7', '4LYT.solv10.equil.rst7')
 
